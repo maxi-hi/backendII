@@ -1,0 +1,130 @@
+<h1 class="display-4 text-center mb-5">Productos</h1>
+<input type="hidden" id="carritoId" value="{{cartId}}">
+
+<div class="container">
+    <div class="row">
+    {{#each productos}}
+        <div class="col-12 col-md-6 col-lg-4 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title text-primary">{{this.title}}</h5>
+                    <p class="card-text text-muted small">ID: {{this._id}}</p>
+                    <p class="card-text">{{this.description}}</p>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="h5 mb-0">${{this.price}}</span>
+                        <span class="badge bg-secondary">{{this.category}}</span>
+                    </div>
+                    <button class="btn btn-primary w-100" onclick="agregarAlCarrito('{{this._id}}')">
+                        Agregar al Carrito
+                    </button>
+                </div>
+            </div>
+        </div>
+    {{/each}}
+    </div>
+
+    <div class="d-flex justify-content-center gap-2 mt-4">
+        {{#if hasPrevPage}}
+            <a href="/products?page={{prevPage}}" class="btn btn-outline-primary">Anterior</a>
+        {{/if}}
+        
+        <span class="btn btn-light disabled">
+            Página {{currentPage}} de {{totalPages}}
+        </span>
+
+        {{#if hasNextPage}}
+            <a href="/products?page={{nextPage}}" class="btn btn-outline-primary">Siguiente</a>
+        {{/if}}
+    </div>
+</div>
+
+<div class="modal fade" id="agregarCarritoModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Agregar al Carrito</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="productId">
+                <div class="mb-3">
+                    <label for="cantidad" class="form-label">Cantidad</label>
+                    <div class="input-group">
+                        <button class="btn btn-outline-secondary" type="button" onclick="decrementCantidad()">-</button>
+                        <input type="number" class="form-control text-center" id="cantidad" value="1" min="1">
+                        <button class="btn btn-outline-secondary" type="button" onclick="incrementCantidad()">+</button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="confirmarAgregarAlCarrito()">Confirmar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function incrementCantidad() {
+    const input = document.getElementById('cantidad');
+    input.value = parseInt(input.value) + 1;
+}
+
+function decrementCantidad() {
+    const input = document.getElementById('cantidad');
+    const value = parseInt(input.value);
+    if (value > 1) {
+        input.value = value - 1;
+    }
+}
+
+async function agregarAlCarrito(productId) {
+    document.getElementById('productId').value = productId;
+    try {
+        const modal = new bootstrap.Modal(document.getElementById('agregarCarritoModal'));
+        modal.show();
+    } catch (error) {
+        console.error('Error al mostrar el modal:', error);
+        alert(`Error al mostrar el modal: ${error.message}`);
+    }
+}
+
+async function confirmarAgregarAlCarrito() {
+    const productId = document.getElementById('productId').value;
+    const carritoId = document.getElementById('carritoId').value;
+    const cantidad = document.getElementById('cantidad').value;
+    
+    try {
+        const response = await fetch(`/api/carts/${carritoId}/product/${productId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ quantity: cantidad })
+        });
+
+        const result = await response.json();
+        if (response.ok) {
+            const modal = bootstrap.Modal.getInstance(document.getElementById('agregarCarritoModal'));
+            modal.hide();
+            alert('Producto agregado al carrito exitosamente');
+        } else {
+            alert(result.error || 'Error al agregar el producto al carrito');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error al agregar el producto al carrito');
+    }
+}
+</script>
+
+<style>
+.card {
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+</style>

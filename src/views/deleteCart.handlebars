@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eliminar Carrito</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h2 class="card-title text-center mb-4">Delete Cart</h2>
+                <form id="deleteCartForm">
+                    <div class="mb-4">
+                        <label for="cartId" class="form-label">Cart ID</label>
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="bi bi-hash"></i>
+                            </span>
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="cartId" 
+                                   placeholder="Enter cart ID"
+                                   required>
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-danger btn-lg">
+                            <i class="bi bi-trash me-2"></i>Delete Cart
+                        </button>
+                    </div>
+                </form>
+                <div id="message" class="alert mt-4 d-none"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <script>
+document.getElementById('deleteCartForm').addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const messageDiv = document.getElementById('message');
+    const cartId = document.getElementById('cartId').value;
+
+    try {
+        const response = await fetch(`/api/carts/${cartId}`, {
+            method: 'DELETE'
+        });
+
+        messageDiv.classList.remove('d-none', 'alert-danger', 'alert-success');
+        
+        if (response.ok) {
+            messageDiv.classList.add('alert-success');
+            messageDiv.innerHTML = `
+                <i class="bi bi-check-circle me-2"></i>
+                Cart deleted successfully
+            `;
+            document.getElementById('cartId').value = '';
+        } else {
+            const data = await response.json();
+            messageDiv.classList.add('alert-danger');
+            messageDiv.innerHTML = `
+                <i class="bi bi-exclamation-triangle me-2"></i>
+                ${data.error || 'Cart not found'}
+            `;
+        }
+    } catch (error) {
+        console.error('Error deleting cart:', error);
+        messageDiv.classList.remove('d-none');
+        messageDiv.classList.add('alert-danger');
+        messageDiv.innerHTML = `
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            Error deleting cart. Please try again.
+        `;
+    }
+});
+</script>
+</body>
+</html>

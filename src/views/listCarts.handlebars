@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Listar Carritos</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="mb-4">My Cart</h1>
+        <input type="hidden" id="idCarrito" value="{{cartId}}">
+        <div id="carritos" class="card-body p-0"></div>
+    </div>
+    
+    <script>
+        const cartId = document.getElementById("idCarrito").value;
+       async function cargarCarrito(cartId) {
+         try {
+        // Hacemos una solicitud GET a la ruta "/api/carts/:cid", donde cid es el cartId
+        const response = await fetch(`/api/carts/${cartId}`);
+        
+        if (!response.ok) {
+            throw new Error('Error al obtener el carrito');
+        }
+
+        // Parseamos la respuesta JSON
+        const carrito = await response.json();
+
+        // Seleccionamos el contenedor donde queremos mostrar los productos del carrito
+        const contenedorCarritos = document.getElementById('carritos');
+        contenedorCarritos.innerHTML = ''; // Limpiamos el contenido anterior
+
+        // Creamos un nuevo div para mostrar los productos del carrito
+        const carritoDiv = document.createElement('div');
+        carritoDiv.classList.add('card', 'my-3');
+        carritoDiv.innerHTML = `
+            <div class="card-header">
+                Carrito ID: ${cartId}
+            </div>
+            <div class="card-body">
+                <h5 class="card-title">Productos:</h5>
+                <ul class="list-group list-group-flush">
+                    ${carrito.map(item => `
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Producto: ${item.product.title} - Precio: $${item.product.price} - Cantidad: ${item.quantity}
+                            <button class="btn btn-danger btn-sm" onclick="eliminarDelCarrito('${cartId}', '${item.product._id}')">Eliminar</button>
+                        </li>
+                    `).join('')}
+                </ul>
+            </div>
+        `;
+
+        // Añadimos el nuevo div al contenedor
+        contenedorCarritos.appendChild(carritoDiv);
+    } catch (error) {
+        console.error('Error al cargar el carrito:', error);
+    }
+}
+
+        async function eliminarDelCarrito(cartId, productId) {
+            try {
+                const response = await fetch(`/api/carts/${cartId}/product/${productId}`, {
+                    method: 'DELETE'
+                });
+                const result = await response.json();
+
+                if (response.ok) {
+                    alert('Producto eliminado del carrito exitosamente');
+                    cargarCarrito(cartId); // Recarga la lista de carritos para mostrar los cambios
+                } else {
+                    alert('Error al eliminar producto del carrito');
+                    console.error(result);
+                }
+            } catch (error) {
+                console.error('Error al eliminar producto del carrito:', error);
+                alert('Error al eliminar producto del carrito');
+            }
+        }
+        cargarCarrito(cartId);
+    </script>
+</body>
+</html>

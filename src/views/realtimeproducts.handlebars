@@ -1,0 +1,54 @@
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h1 class="card-title mb-4">Real Time Products</h1>
+                    <div id="contenedorProductos" class="table-responsive"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h2 class="card-title mb-4">Add New Product</h2>
+                    <form id="productForm">
+                        <div class="mb-3">
+                            <input type="text" class="form-control" id="title" placeholder="Title">
+                        </div>
+                        <div class="mb-3">
+                            <textarea class="form-control" id="description" placeholder="Description"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <input type="number" class="form-control" id="price" placeholder="Price">
+                        </div>
+                        <div class="mb-3">
+                            <input type="text" class="form-control" id="img" value="No Image">
+                        </div>
+                        <div class="mb-3">
+                            <input type="text" class="form-control" id="code" placeholder="Code">
+                        </div>
+                        <div class="mb-3">
+                            <input type="number" class="form-control" id="stock" placeholder="Stock">
+                        </div>
+                        <div class="mb-3">
+                            <input type="text" class="form-control" id="category" placeholder="Category">
+                        </div>
+                        <div class="mb-4">
+                            <select class="form-select" id="status">
+                                <option value="true">Active</option>
+                                <option value="false">Inactive</option>
+                            </select>
+                        </div>
+                        <button type="button" id="btnEnviar" class="btn btn-primary w-100">
+                            <i class="bi bi-plus-circle me-2"></i>Add Product
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.socket.io/4.7.4/socket.io.min.js"></script>
+<script src="js/index.js"></script>
